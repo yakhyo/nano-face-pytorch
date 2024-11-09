@@ -8,7 +8,7 @@ import torch
 
 from layers import PriorBox
 from config import get_config
-from models import RetinaFace, Slim, RFB
+from models import RetinaFace, SlimFace, RFB
 from utils.general import draw_detections
 from utils.box_utils import decode, decode_landmarks, nms
 
@@ -106,7 +106,7 @@ def main(params):
     if params.network == "mobilenetv1_0.25":
         model = RetinaFace(cfg=cfg)
     elif params.network == "slim":
-        model = Slim(cfg=cfg)
+        model = SlimFace(cfg=cfg)
     elif params.network == "rfb":
         model = RFB(cfg=cfg)
     else:

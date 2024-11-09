@@ -20,7 +20,7 @@ cfg_mnet = {
     'image_size': 640,
     'pretrain': True,
     'return_layers': {'stage1': 1, 'stage2': 2, 'stage3': 3},
-    'in_channel': 32,
+    'in_channel': 64,
     'out_channel': 64
 }
 
@@ -35,8 +35,6 @@ cfg_slim = {
     'epochs': 250,
     'milestones': [190, 220],
     'image_size': 640,
-    'pretrain': False,
-    'return_layers': {'stage1': 1, 'stage2': 2, 'stage3': 3, 'stage4': 4},
 }
 
 cfg_rfb = {
@@ -47,9 +45,7 @@ cfg_rfb = {
     'clip': False,
     'loc_weight': 2.0,
     'batch_size': 32,
-    'epoch': 250,
+    'epochs': 250,
     'milestones': [190, 220],
     'image_size': 640,
-    'pretrain': False,
-    'return_layers': {'stage1': 1, 'stage2': 2, 'stage3': 3, 'stage4': 4}
 }

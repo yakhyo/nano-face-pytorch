@@ -1,21 +1,26 @@
-from typing import List, Tuple
+"""
+Author: Yakhyokhuja Valikhujaev
+Date: 2024-11-09
+"""
 
 import torch
 from torch import nn, Tensor
 import torch.nn.functional as F
 import torchvision.models._utils as _utils
 
-from models.mobilenet import mobilenet_v1_025
+from typing import List, Tuple
+
 from models.common import SSH, FPN
+from models.mobilenet import mobilenet_v1_025
 
 
 class ClassHead(nn.Module):
-    def __init__(self, in_channels: int = 512, num_anchors: int = 2, fpn_num: int = 3) -> None:
+    def __init__(self, in_channels: int = 512, num_anchors: int = 2, num_classes: int = 2,  fpn_num: int = 3) -> None:
         super().__init__()
         self.class_head = nn.ModuleList([
             nn.Conv2d(
                 in_channels=in_channels,
-                out_channels=num_anchors * 2,
+                out_channels=num_anchors * num_classes,
                 kernel_size=(1, 1),
                 stride=1,
                 padding=0
@@ -91,13 +96,15 @@ class RetinaFace(nn.Module):
         self.fx = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])  # feature extraction
 
         num_anchors = 2
+        num_classes = 2
+
         base_in_channels = cfg['in_channel']
         out_channels = cfg['out_channel']
 
         fpn_in_channels = [
+            base_in_channels * 1,
             base_in_channels * 2,
             base_in_channels * 4,
-            base_in_channels * 8,
         ]
 
         self.fpn = FPN(fpn_in_channels, out_channels)
@@ -105,7 +112,12 @@ class RetinaFace(nn.Module):
         self.ssh2 = SSH(out_channels, out_channels)
         self.ssh3 = SSH(out_channels, out_channels)
 
-        self.class_head = ClassHead(in_channels=cfg['out_channel'], num_anchors=num_anchors, fpn_num=3)
+        self.class_head = ClassHead(
+            in_channels=cfg['out_channel'],
+            num_anchors=num_anchors,
+            num_classes=num_classes,
+            fpn_num=3
+        )
         self.bbox_head = BboxHead(in_channels=cfg['out_channel'], num_anchors=num_anchors, fpn_num=3)
         self.landmark_head = LandmarkHead(in_channels=cfg['out_channel'], num_anchors=num_anchors, fpn_num=3)
 

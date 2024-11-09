@@ -64,7 +64,7 @@ class DepthWiseSeparableConv2d(nn.Sequential):
             self,
             in_channels: int,
             out_channels: int,
-            stride: int,
+            stride: int = 1,
             norm_layer: Optional[Callable[..., torch.nn.Module]] = None
     ) -> None:
 
