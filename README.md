@@ -20,19 +20,19 @@ Nano-Face-PyTorch is an ultra-lightweight face detection model optimized for mob
 
 ### Multi-scale Image Size
 
-| Models    | Pretrained on ImageNet | Easy   | Medium | Hard   | Model Size |
-| --------- | ---------------------- | ------ | ------ | ------ | ---------- |
-| Slim      | False                  | 88.04% | 85.47% | 55.40% | 1.39 MB    |
-| RFB       | False                  | 90.59% | 89.14% | 84.13% | 2.8 MB     |
-| Nano-Face | True                   | 89.00% | 87.50% | 81.00% | 1.3 MB     |
+| Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | Model Size |
+| ---------- | ---------------------- | ------ | ------ | ------ | ---------- |
+| SlimFace   | False                  | 81.65% | 82.12% | 74.35% | 1.39 MB    |
+| RFB        | False                  | 90.59% | 89.14% | 84.13% | MB         |
+| RetinaFace | True                   | 89.00% | 87.50% | 81.00% | MB         |
 
 ### Original Image Size
 
-| Models    | Pretrained on ImageNet | Easy   | Medium | Hard   | Model Size |
-| --------- | ---------------------- | ------ | ------ | ------ | ---------- |
-| Slim      | False                  | 88.04% | 85.47% | 55.40% | 1.39dd MB  |
-| RFB       | False                  | %      | %      | %      | 2.8 MB     |
-| Nano-Face | True                   | %      | %      | %      | 1.3 MB     |
+| Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | Model Size |
+| ---------- | ---------------------- | ------ | ------ | ------ | ---------- |
+| SlimFace   | False                  | 88.04% | 85.47% | 55.40% | 1.39 MB    |
+| RFB        | False                  | %      | %      | %      | MB         |
+| RetinaFace | True                   | %      | %      | %      | MB         |
 
 ## ✨ Features
 

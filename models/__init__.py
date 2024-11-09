@@ -1,3 +1,3 @@
 from .retinaface import RetinaFace
-from .slim import Slim
+from .slim import SlimFace
 from .rfb import RFB

@@ -1,187 +1,195 @@
+"""
+Author: Yakhyokhuja Valikhujaev
+Date: 2024-11-09
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from typing import List, Tuple
+
 from models.common import Conv2dNormActivation, DepthWiseSeparableConv2d, DepthwiseConv2d
 
 
-class BasicConv(nn.Module):
+class ClassHead(nn.Module):
+    def __init__(self, in_channels: int = 64, num_classes: int = 2, anchors: List[int] = [2, 3]) -> None:
+        super().__init__()
+        self.class_head = nn.ModuleList([
+            DepthwiseConv2d(in_channels=in_channels, out_channels=anchors[1] * 2, kernel_size=3),
+            DepthwiseConv2d(in_channels=in_channels * 2, out_channels=anchors[0] * 2, kernel_size=3),
+            DepthwiseConv2d(in_channels=in_channels * 4, out_channels=anchors[0] * 2, kernel_size=3),
+            nn.Conv2d(in_channels=in_channels * 4, out_channels=anchors[1] * 2, kernel_size=3, padding=1)
+        ])
 
-    def __init__(self, in_planes, out_planes, kernel_size, stride=1, padding=0, dilation=1, groups=1, relu=True, bn=True):
-        super(BasicConv, self).__init__()
-        self.out_channels = out_planes
-        if bn:
-            self.conv = nn.Conv2d(
-                in_planes,
-                out_planes,
-                kernel_size=kernel_size,
-                stride=stride,
-                padding=padding,
-                dilation=dilation,
-                groups=groups,
-                bias=False
-            )
-            self.bn = nn.BatchNorm2d(out_planes, eps=1e-5, momentum=0.01, affine=True)
-            self.relu = nn.ReLU(inplace=True) if relu else None
-        else:
-            self.conv = nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
-                                  padding=padding, dilation=dilation, groups=groups, bias=True)
-            self.bn = None
-            self.relu = nn.ReLU(inplace=True) if relu else None
+    def forward(self, x: List[torch.Tensor]) -> torch.Tensor:
+        outputs = []
+        for feature, layer in zip(x, self.class_head):
+            outputs.append(layer(feature).permute(0, 2, 3, 1).contiguous())
+        outputs = torch.cat([out.view(out.shape[0], -1, 2) for out in outputs], dim=1)
+        return outputs
 
-    def forward(self, x):
-        x = self.conv(x)
-        if self.bn is not None:
-            x = self.bn(x)
-        if self.relu is not None:
-            x = self.relu(x)
-        return x
+
+class BboxHead(nn.Module):
+    def __init__(self, in_channels: int = 64, anchors: List[int] = [2, 3]) -> None:
+        super().__init__()
+        self.bbox_head = nn.ModuleList([
+            DepthwiseConv2d(in_channels=in_channels, out_channels=anchors[1] * 4, kernel_size=3),
+            DepthwiseConv2d(in_channels=in_channels * 2, out_channels=anchors[0] * 4, kernel_size=3),
+            DepthwiseConv2d(in_channels=in_channels * 4, out_channels=anchors[0] * 4, kernel_size=3),
+            nn.Conv2d(in_channels=in_channels * 4, out_channels=anchors[1] * 4, kernel_size=3, padding=1)
+        ])
+
+    def forward(self, x: List[torch.Tensor]) -> torch.Tensor:
+        outputs = []
+        for feature, layer in zip(x, self.bbox_head):
+            outputs.append(layer(feature).permute(0, 2, 3, 1).contiguous())
+        outputs = torch.cat([out.view(out.shape[0], -1, 4) for out in outputs], dim=1)
+        return outputs
+
+
+class LandmarkHead(nn.Module):
+    def __init__(self, in_channels: int = 64, anchors: List[int] = [2, 3]) -> None:
+        super().__init__()
+        self.landmark_head = nn.ModuleList([
+            DepthwiseConv2d(in_channels=in_channels, out_channels=anchors[1] * 10, kernel_size=3),
+            DepthwiseConv2d(in_channels=in_channels * 2, out_channels=anchors[0] * 10, kernel_size=3),
+            DepthwiseConv2d(in_channels=in_channels * 4, out_channels=anchors[0] * 10, kernel_size=3),
+            nn.Conv2d(in_channels=in_channels * 4, out_channels=anchors[1] * 10, kernel_size=3, padding=1)
+        ])
+
+    def forward(self, x: List[torch.Tensor]) -> torch.Tensor:
+        outputs = []
+        for feature, layer in zip(x, self.landmark_head):
+            outputs.append(layer(feature).permute(0, 2, 3, 1).contiguous())
+        outputs = torch.cat([out.view(out.shape[0], -1, 10) for out in outputs], dim=1)
+        return outputs
 
 
 class BasicRFB(nn.Module):
+    """
+    Basic Receptive Field Block (RFB) for feature extraction.
+    """
 
-    def __init__(self, in_planes, out_planes, stride=1, scale=0.1, map_reduce=8, vision=1, groups=1):
-        super(BasicRFB, self).__init__()
+    def __init__(self, in_channels: int, out_channels: int, scale: float = 0.1, map_reduce: int = 8) -> None:
+        super().__init__()
         self.scale = scale
-        self.out_channels = out_planes
-        inter_planes = in_planes // map_reduce
+        inter_channels = in_channels // map_reduce
 
-        self.branch0 = nn.Sequential(
-            BasicConv(in_planes, inter_planes, kernel_size=1, stride=1, groups=groups, relu=False),
-            BasicConv(inter_planes, 2 * inter_planes, kernel_size=(3, 3), stride=stride, padding=(1, 1), groups=groups),
-            BasicConv(2 * inter_planes, 2 * inter_planes, kernel_size=3, stride=1,
-                      padding=vision + 1, dilation=vision + 1, relu=False, groups=groups)
-        )
         self.branch1 = nn.Sequential(
-            BasicConv(in_planes, inter_planes, kernel_size=1, stride=1, groups=groups, relu=False),
-            BasicConv(inter_planes, 2 * inter_planes, kernel_size=(3, 3), stride=stride, padding=(1, 1), groups=groups),
-            BasicConv(2 * inter_planes, 2 * inter_planes, kernel_size=3, stride=1,
-                      padding=vision + 2, dilation=vision + 2, relu=False, groups=groups)
+            Conv2dNormActivation(in_channels, inter_channels, kernel_size=1, activation_layer=None),
+            Conv2dNormActivation(inter_channels, 2 * inter_channels, kernel_size=3),
+            Conv2dNormActivation(
+                2 * inter_channels,
+                2 * inter_channels,
+                kernel_size=3,
+                padding=2,
+                dilation=2,
+                activation_layer=None
+            )
         )
         self.branch2 = nn.Sequential(
-            BasicConv(in_planes, inter_planes, kernel_size=1, stride=1, groups=groups, relu=False),
-            BasicConv(inter_planes, (inter_planes // 2) * 3, kernel_size=3, stride=1, padding=1, groups=groups),
-            BasicConv((inter_planes // 2) * 3, 2 * inter_planes,
-                      kernel_size=3, stride=stride, padding=1, groups=groups),
-            BasicConv(2 * inter_planes, 2 * inter_planes, kernel_size=3, stride=1,
-                      padding=vision + 4, dilation=vision + 4, relu=False, groups=groups)
+            Conv2dNormActivation(in_channels, inter_channels, kernel_size=1,  activation_layer=None),
+            Conv2dNormActivation(inter_channels, 2 * inter_channels, kernel_size=3),
+            Conv2dNormActivation(
+                2 * inter_channels,
+                2 * inter_channels,
+                kernel_size=3,
+                padding=3,
+                dilation=3,
+                activation_layer=None
+            )
+        )
+        self.branch3 = nn.Sequential(
+            Conv2dNormActivation(in_channels, inter_channels, kernel_size=1, activation_layer=None),
+            Conv2dNormActivation(inter_channels, 3 * inter_channels // 2, kernel_size=3),
+            Conv2dNormActivation(3 * inter_channels // 2, 2 * inter_channels, kernel_size=3),
+            Conv2dNormActivation(
+                2 * inter_channels,
+                2 * inter_channels,
+                kernel_size=3,
+                padding=5,
+                dilation=5,
+                activation_layer=None
+            )
         )
 
-        self.ConvLinear = BasicConv(6 * inter_planes, out_planes, kernel_size=1, stride=1, relu=False)
-        self.shortcut = BasicConv(in_planes, out_planes, kernel_size=1, stride=stride, relu=False)
+        self.conv_linear = Conv2dNormActivation(6 * inter_channels, out_channels, kernel_size=1, activation_layer=None)
+        self.shortcut = Conv2dNormActivation(in_channels, out_channels, kernel_size=1, activation_layer=None)
         self.relu = nn.ReLU(inplace=False)
 
-    def forward(self, x):
-        x0 = self.branch0(x)
-        x1 = self.branch1(x)
-        x2 = self.branch2(x)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        b1 = self.branch1(x)
+        b2 = self.branch1(x)
+        b3 = self.branch1(x)
 
-        out = torch.cat((x0, x1, x2), 1)
-        out = self.ConvLinear(out)
-        short = self.shortcut(x)
-        out = out * self.scale + short
+        out = torch.cat([b1, b2, b3], dim=1)
+        out = self.conv_linear(out) * self.scale + self.shortcut(x)
         out = self.relu(out)
-
         return out
 
 
 class RFB(nn.Module):
-    def __init__(self, cfg=None):
+    """
+    RFB-based face detection model.
+    """
+
+    def __init__(self, cfg: dict = None):
         super().__init__()
         self.num_classes = 2
+        self.anchors = [2, 3]
+        self.stage1 = nn.Sequential(
+            Conv2dNormActivation(3, 16, stride=2),
+            DepthWiseSeparableConv2d(16, 32),
+            DepthWiseSeparableConv2d(32, 32, stride=2),
+            DepthWiseSeparableConv2d(32, 32),
+            DepthWiseSeparableConv2d(32, 64, stride=2),
+            DepthWiseSeparableConv2d(64, 64),
+            DepthWiseSeparableConv2d(64, 64),
+            BasicRFB(64, 64, scale=1.0)
+        )
 
-        self.conv1 = Conv2dNormActivation(in_channels=3, out_channels=16, stride=2)
-        self.conv2 = DepthWiseSeparableConv2d(in_channels=16, out_channels=32, stride=1)
-        self.conv3 = DepthWiseSeparableConv2d(in_channels=32, out_channels=32, stride=2)
-        self.conv4 = DepthWiseSeparableConv2d(in_channels=32, out_channels=32, stride=1)
-        self.conv5 = DepthWiseSeparableConv2d(in_channels=32, out_channels=64, stride=2)
-        self.conv6 = DepthWiseSeparableConv2d(in_channels=64, out_channels=64, stride=1)
-        self.conv7 = DepthWiseSeparableConv2d(in_channels=64, out_channels=64, stride=1)
-        self.conv8 = BasicRFB(64, 64, stride=1, scale=1.0)
+        self.stage2 = nn.Sequential(
+            DepthWiseSeparableConv2d(64, 128, stride=2),
+            DepthWiseSeparableConv2d(128, 128),
+            DepthWiseSeparableConv2d(128, 128)
+        )
 
-        self.conv9 = DepthWiseSeparableConv2d(in_channels=64, out_channels=128, stride=2)
-        self.conv10 = DepthWiseSeparableConv2d(in_channels=128, out_channels=128, stride=1)
-        self.conv11 = DepthWiseSeparableConv2d(in_channels=128, out_channels=128, stride=1)
+        self.stage3 = nn.Sequential(
+            DepthWiseSeparableConv2d(128, 256, stride=2),
+            DepthWiseSeparableConv2d(256, 256)
+        )
 
-        self.conv12 = DepthWiseSeparableConv2d(in_channels=128, out_channels=256, stride=2)
-        self.conv13 = DepthWiseSeparableConv2d(in_channels=256, out_channels=256, stride=1)
-
-        self.conv14 = nn.Sequential(
-            nn.Conv2d(in_channels=256, out_channels=64, kernel_size=1),
+        self.stage4 = nn.Sequential(
+            nn.Conv2d(256, 64, kernel_size=1),
             nn.ReLU(inplace=True),
             DepthwiseConv2d(64, 256, kernel_size=3, stride=2, padding=1),
             nn.ReLU(inplace=True)
         )
-        self.loc, self.conf, self.landm = self.multibox(self.num_classes)
 
-    def multibox(self, num_classes):
-        loc_layers = []
-        conf_layers = []
-        landm_layers = []
-        loc_layers += [DepthwiseConv2d(64, 3 * 4, kernel_size=3, padding=1)]
-        conf_layers += [DepthwiseConv2d(64, 3 * num_classes, kernel_size=3, padding=1)]
-        landm_layers += [DepthwiseConv2d(64, 3 * 10, kernel_size=3, padding=1)]
+        # Detection heads
+        self.class_head = ClassHead(in_channels=64, num_classes=self.num_classes, anchors=self.anchors)
+        self.bbox_head = BboxHead(in_channels=64, anchors=self.anchors)
+        self.landmark_head = LandmarkHead(in_channels=64, anchors=self.anchors)
 
-        loc_layers += [DepthwiseConv2d(128, 2 * 4, kernel_size=3, padding=1)]
-        conf_layers += [DepthwiseConv2d(128, 2 * num_classes, kernel_size=3, padding=1)]
-        landm_layers += [DepthwiseConv2d(128, 2 * 10, kernel_size=3, padding=1)]
+    def forward(self, x: torch.Tensor) -> tuple:
+        features = []
+        x = self.stage1(x)
+        features.append(x)
 
-        loc_layers += [DepthwiseConv2d(256, 2 * 4, kernel_size=3, padding=1)]
-        conf_layers += [DepthwiseConv2d(256, 2 * num_classes, kernel_size=3, padding=1)]
-        landm_layers += [DepthwiseConv2d(256, 2 * 10, kernel_size=3, padding=1)]
+        x = self.stage2(x)
+        features.append(x)
 
-        loc_layers += [nn.Conv2d(256, 3 * 4, kernel_size=3, padding=1)]
-        conf_layers += [nn.Conv2d(256, 3 * num_classes, kernel_size=3, padding=1)]
-        landm_layers += [nn.Conv2d(256, 3 * 10, kernel_size=3, padding=1)]
-        return nn.Sequential(*loc_layers), nn.Sequential(*conf_layers), nn.Sequential(*landm_layers)
+        x = self.stage3(x)
+        features.append(x)
 
-    def forward(self, inputs):
-        detections = list()
-        loc = list()
-        conf = list()
-        landm = list()
+        x = self.stage4(x)
+        features.append(x)
 
-        x1 = self.conv1(inputs)
-        x2 = self.conv2(x1)
-        x3 = self.conv3(x2)
-        x4 = self.conv4(x3)
-        x5 = self.conv5(x4)
-        x6 = self.conv6(x5)
-        x7 = self.conv7(x6)
-        x8 = self.conv8(x7)
-        detections.append(x8)
-
-        x9 = self.conv9(x8)
-        x10 = self.conv10(x9)
-        x11 = self.conv11(x10)
-        detections.append(x11)
-
-        x12 = self.conv12(x11)
-        x13 = self.conv13(x12)
-        detections.append(x13)
-
-        x14 = self.conv14(x13)
-        detections.append(x14)
-
-        for (x, l, c, lam) in zip(detections, self.loc, self.conf, self.landm):
-            loc.append(l(x).permute(0, 2, 3, 1).contiguous())
-            conf.append(c(x).permute(0, 2, 3, 1).contiguous())
-            landm.append(lam(x).permute(0, 2, 3, 1).contiguous())
-
-        bbox_regressions = torch.cat([o.view(o.size(0), -1, 4) for o in loc], 1)
-        classifications = torch.cat([o.view(o.size(0), -1, 2) for o in conf], 1)
-        ldm_regressions = torch.cat([o.view(o.size(0), -1, 10) for o in landm], 1)
+        classifications = self.class_head(features)
+        bbox_regressions = self.bbox_head(features)
+        landmark_regressions = self.landmark_head(features)
 
         if self.training:
-            output = (bbox_regressions, classifications, ldm_regressions)
-        else:
-            output = (bbox_regressions, F.softmax(classifications, dim=-1), ldm_regressions)
-        return output
-
-
-if __name__ == "__main__":
-    model = RFB()
-
-    print(sum(p.numel() for p in model.parameters() if p.requires_grad))
-
-# 359592
+            return bbox_regressions, classifications, landmark_regressions
+        return bbox_regressions, F.softmax(classifications, dim=-1), landmark_regressions

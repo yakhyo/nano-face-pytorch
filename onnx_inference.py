@@ -5,10 +5,10 @@ import onnxruntime as ort
 import argparse
 import torch
 
-from utils.general import draw_detections
-from utils.box_utils import decode, decode_landmarks, nms
 from layers import PriorBox
 from config import get_config
+from utils.general import draw_detections
+from utils.box_utils import decode, decode_landmarks, nms
 
 
 def parse_arguments():

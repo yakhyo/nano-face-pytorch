@@ -5,34 +5,30 @@ import numpy as np
 
 import torch
 
+from models import RetinaFace, SlimFace, RFB
 from layers import PriorBox
 from config import get_config
-from models import RetinaFace
 from utils.general import draw_detections
 from utils.box_utils import decode, decode_landmarks, nms
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Retinaface Webcam Inference")
+    parser = argparse.ArgumentParser(description="Webcam Inference")
 
     # Model and device options
     parser.add_argument(
         '-w', '--weights',
         type=str,
-        default='./weights/Resnet34_Final.pth',
+        default='./weights/slim.pth',
         help='Path to the trained model weights'
     )
     parser.add_argument(
         '--network',
         type=str,
-        default='resnet34',
-        choices=[
-            'mobilenetv1', 'mobilenetv1_0.25', 'mobilenetv1_0.50',
-            'mobilenetv2', 'resnet50', 'resnet34', 'resnet18'
-        ],
-        help='Backbone network architecture to use'
+        default='mobilenetv1_0.25',
+        choices=['mobilenetv1_0.25', 'slim', 'rfb'],
+        help='Select a model architecture for face detection'
     )
-
     # Detection settings
     parser.add_argument(
         '--conf-threshold',
@@ -113,8 +109,15 @@ def main(params):
     rgb_mean = (104, 117, 123)
     resize_factor = 1
 
-    # model initialization
-    model = RetinaFace(cfg=cfg)
+    # Initialize model
+    if params.network == "mobilenetv1_0.25":
+        model = RetinaFace(cfg=cfg)
+    elif params.network == "slim":
+        model = SlimFace(cfg=cfg)
+    elif params.network == "rfb":
+        model = RFB(cfg=cfg)
+    else:
+        raise NameError("Please choose existing face detection method!")
     model.to(device)
 
     # loading state_dict

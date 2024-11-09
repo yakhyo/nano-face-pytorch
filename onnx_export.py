@@ -2,7 +2,7 @@ import os
 import argparse
 import torch
 
-from models import RetinaFace
+from models import RetinaFace, SlimFace, RFB
 from config import get_config
 
 
@@ -40,7 +40,7 @@ def onnx_export(params):
     if params.network == "mobilenetv1_0.25":
         model = RetinaFace(cfg=cfg)
     elif params.network == "slim":
-        model = Slim(cfg=cfg)
+        model = SlimFace(cfg=cfg)
     elif params.network == "rfb":
         model = RFB(cfg=cfg)
     else:

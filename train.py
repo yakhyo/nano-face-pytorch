@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from config import get_config
-from models import RetinaFace, Slim
+from models import RetinaFace, SlimFace, RFB
 from layers import PriorBox, MultiBoxLoss
 
 from utils.dataset import WiderFaceDetection
@@ -17,7 +17,7 @@ from utils.transform import Augmentation
 def parse_args():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Training Arguments for RetinaFace')
+    parser = argparse.ArgumentParser(description='Training Arguments')
     parser.add_argument(
         '--train-data',
         type=str,
@@ -147,7 +147,7 @@ def main(params):
     if params.network == "mobilenetv1_0.25":
         model = RetinaFace(cfg=cfg)
     elif params.network == "slim":
-        model = Slim(cfg=cfg)
+        model = SlimFace(cfg=cfg)
     elif params.network == "rfb":
         model = RFB(cfg=cfg)
     else:
