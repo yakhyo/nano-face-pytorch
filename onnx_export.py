@@ -16,10 +16,10 @@ def parse_arguments():
         help='Trained state_dict file path to open'
     )
     parser.add_argument(
-        '-n', '--network',
+        '--network',
         type=str,
-        default='mobilenetv1_0.25',
-        choices=['mobilenetv1_0.25', 'slim', 'rfb'],
+        default='retinaface',
+        choices=['retinaface', 'slim', 'rfb'],
         help='Select a model architecture for face detection'
     )
 
@@ -37,7 +37,7 @@ def onnx_export(params):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Initialize model
-    if params.network == "mobilenetv1_0.25":
+    if params.network == "retinaface":
         model = RetinaFace(cfg=cfg)
     elif params.network == "slim":
         model = SlimFace(cfg=cfg)

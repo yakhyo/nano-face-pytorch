@@ -25,8 +25,8 @@ def parse_arguments():
     parser.add_argument(
         '--network',
         type=str,
-        default='mobilenetv1_0.25',
-        choices=['mobilenetv1_0.25', 'slim', 'rfb'],
+        default='retinaface',
+        choices=['retinaface', 'slim', 'rfb'],
         help='Select a model architecture for face detection'
     )
     # Detection settings
@@ -110,7 +110,7 @@ def main(params):
     resize_factor = 1
 
     # Initialize model
-    if params.network == "mobilenetv1_0.25":
+    if params.network == "retinaface":
         model = RetinaFace(cfg=cfg)
     elif params.network == "slim":
         model = SlimFace(cfg=cfg)

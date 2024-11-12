@@ -1,6 +1,6 @@
 def get_config(network):
     configs = {
-        "mobilenetv1_0.25": cfg_mnet,
+        "retinaface": cfg_mnet,
         "slim": cfg_slim,
         "rfb": cfg_rfb,
     }
@@ -8,7 +8,7 @@ def get_config(network):
 
 
 cfg_mnet = {
-    'name': 'mobilenet0.25',
+    'name': 'retinaface',
     'min_sizes': [[16, 32], [64, 128], [256, 512]],
     'steps': [8, 16, 32],
     'variance': [0.1, 0.2],

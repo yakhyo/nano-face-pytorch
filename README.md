@@ -1,54 +1,62 @@
-# 📸 Nano-Face-PyTorch: Ultra-lightweight Face Detection
+# 📸 Tiny-Face: Ultra-lightweight Face Detection
 
-[![Downloads](https://img.shields.io/github/downloads/yakhyo/nano-face-pytorch/total)](https://github.com/yakhyo/nano-face-pytorch/releases)
-[![GitHub Repo stars](https://img.shields.io/github/stars/yakhyo/nano-face-pytorch)](https://github.com/yakhyo/nano-face-pytorch/stargazers)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/yakhyo/nano-face-pytorch)
-[![GitHub License](https://img.shields.io/github/license/yakhyo/nano-face-pytorch)](https://github.com/yakhyo/nano-face-pytorch/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/yakhyo/tiny-face-pytorch/total)](https://github.com/yakhyo/tiny-face-pytorch/releases)
+[![GitHub Repo stars](https://img.shields.io/github/stars/yakhyo/tiny-face-pytorch)](https://github.com/yakhyo/tiny-face-pytorch/stargazers)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/yakhyo/tiny-face-pytorch)
+[![GitHub License](https://img.shields.io/github/license/yakhyo/tiny-face-pytorch)](https://github.com/yakhyo/tiny-face-pytorch/blob/main/LICENSE)
 
-<video controls autoplay loop src="https://github.com/user-attachments/assets/ad279fea-33fb-43f1-884f-282e6d54c809" muted="false" width="100%"></video>
+<video controls autoplay loop src="https://github.com/user-attachments/assets/faf65b91-db76-4538-beca-87fc65566e51" muted="false" width="100%"></video>
 
-Nano-Face-PyTorch is an ultra-lightweight face detection model optimized for mobile and edge devices. Built upon the concepts of RetinaFace, this model achieves high precision and speed in face detection with minimal resource requirements.
+Tiny-Face is an ultra-lightweight face detection model optimized for mobile and edge devices. Built upon the concepts of RetinaFace, this model achieves high precision and speed in face detection with minimal resource requirements.
 
 > **Note**  
-> This repository refines lightweight architectures like Slim and RFB with a focus on Nano-level efficiency.
+> This repository refines lightweight architectures like RetinaFace (mobile), Slim and RFB with a focus on Tiny-level efficiency.
 
 <div align="center">
-<img src="assets/mv2_test.jpg">
+<img src="assets/test_retina.jpg">
 </div>
 
 ## 📈 Performance on WiderFace
 
 ### Multi-scale Image Size
 
-| Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | Model Size |
-| ---------- | ---------------------- | ------ | ------ | ------ | ---------- |
-| SlimFace   | False                  | 81.65% | 82.12% | 74.35% | 1.39 MB    |
-| RFB        | False                  | 90.59% | 89.14% | 84.13% | MB         |
-| RetinaFace | True                   | 89.00% | 87.50% | 81.00% | MB         |
+| Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | #Params(M) | Size(MB) |
+| ---------- | ---------------------- | ------ | ------ | ------ | ---------- | -------- |
+| SlimFace   | False                  | 79.50% | 79.40% | 68.36% | 0.359      | 1.4      |
+| RFB        | False                  | 80.49% | 81.51% | 75.73% | 0.343      | 1.5      |
+| RetinaFace | True                   | 87.69% | 86.39% | 80.21% | 0.426      | 1.8      |
 
 ### Original Image Size
 
-| Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | Model Size |
+| Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | #Params(M) |
 | ---------- | ---------------------- | ------ | ------ | ------ | ---------- |
-| SlimFace   | False                  | 88.04% | 85.47% | 55.40% | 1.39 MB    |
-| RFB        | False                  | %      | %      | %      | MB         |
-| RetinaFace | True                   | %      | %      | %      | MB         |
+| SlimFace   | False                  | 87.10% | 84.36% | 67.38% | 0.359      |
+| RFB        | False                  | 87.09% | 84.61% | 69.22% | 0.343      |
+| RetinaFace | True                   | 90.26% | 87.48% | 72.85% | 0.426      |
 
 ## ✨ Features
 
-- **Nano-sized Efficiency**: Ultra-lightweight and optimized for low-resource devices.
+- **Tiny-sized Efficiency**: Ultra-lightweight and optimized for low-resource devices.
 - **Mobile-friendly**: Includes Slim, RFB, and MobileNetV1_0.25 configurations.
 - **Pretrained Backbones**: Models suitable for mobile and embedded systems.
 
-### Last Updated: November 9, 2024
+### Download model weights
+
+All weights are available in [GitHub release v0.0.1](https://github.com/yakhyo/tiny-face-pytorch/releases/tag/v0.0.1).
+
+| Models     | PyTorch Weights                                                                                       | ONNX Weights                                                                                            | Input Size |
+| ---------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------- |
+| SlimFace   | [slimface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slimface.pth)     | [slimface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slimface.onnx)     | 640x640    |
+| RFB        | [rfb.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/rfb.pth)               | [rfb.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/rfb.onnx)               | 640x640    |
+| RetinaFace | [retinaface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/retinaface.pth) | [retinaface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/retinaface.onnx) | 640x640    |
 
 ## ⚙️ Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yakhyo/nano-face-pytorch.git
-   cd nano-face-pytorch
+   git clone https://github.com/yakhyo/tiny-face-pytorch.git
+   cd tiny-face-pytorch
    ```
 
 2. Install dependencies:
@@ -93,7 +101,7 @@ python train.py --network slim  # Replace 'slim' with your choice of model
 
 **Available Models**:
 
-- `mobilenetv1_0.25`
+- `retinaface`
 - `slim`
 - `rfb`
 
@@ -102,14 +110,26 @@ python train.py --network slim  # Replace 'slim' with your choice of model
 Inference the model using:
 
 ```bash
-python detect.py --network mobilenetv1_0.25 --weights mobilenetv1_0.25.pth
+python detect.py --network retinaface --weights weights/retinaface.pth
+                           slim                 weights/slim.pth
+                           rfb                  weights/rfb.pth
 ```
+
+#### Model found following number of faces from large selfi image:
+
+- **RetinaFace**: 459
+- **RFB**: 430
+- **Slim**: 384
+<div align="center">
+<img src="assets/largeselfi_retina.jpg">
+<p>RetinaFace model inference result.</p>
+</div>
 
 ## 🧪 Evaluating RetinaFace on WiderFace Dataset
 
 ### 1. Get and Install WiderFace Evaluation Tool
 
-1. Clone the WiderFace evaluation repository inside the `nano-face-pytorch` folder:
+1. Clone the WiderFace evaluation repository inside the `tiny-face-pytorch` folder:
    ```bash
    git clone https://github.com/yakhyo/widerface_evaluation
    ```
@@ -118,7 +138,7 @@ python detect.py --network mobilenetv1_0.25 --weights mobilenetv1_0.25.pth
    cd widerface_evaluation
    python3 setup.py build_ext --inplace
    ```
-3. Return to the `nano-face-pytorch` folder after installation is complete:
+3. Return to the `tiny-face-pytorch` folder after installation is complete:
    ```bash
    cd ..
    ```
@@ -128,7 +148,9 @@ python detect.py --network mobilenetv1_0.25 --weights mobilenetv1_0.25.pth
 Run the following command to evaluate your model with WiderFace, specifying the model architecture (`mobilenetv1_0.25` in this example) and the path to the trained weights. Predictions will be stored in `widerface_txt` inside the `widerface_evaluation` folder.
 
 ```bash
-python evaluate_widerface.py --network mobilenetv1_0.25 --weights weights/mobilenetv1_0.25.pth
+python evaluate_widerface.py --network retinaface --weights weights/retinaface.pth
+                                       slim                 weights/slim.pth
+                                       rfb                  weights/rfb.pth
 ```
 
 ### 3. Run the Final Evaluation

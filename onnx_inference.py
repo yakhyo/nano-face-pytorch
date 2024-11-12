@@ -22,10 +22,10 @@ def parse_arguments():
         help='Path to the trained model weights'
     )
     parser.add_argument(
-        '-n', '--network',
+        '--network',
         type=str,
-        default='mobilenetv1_0.25',
-        choices=['mobilenetv1_0.25', 'slim', 'rfb'],
+        default='retinaface',
+        choices=['retinaface', 'slim', 'rfb'],
         help='Select a model architecture for face detection'
     )
 

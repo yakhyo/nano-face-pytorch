@@ -27,8 +27,8 @@ def parse_args():
     parser.add_argument(
         '--network',
         type=str,
-        default='mobilenetv1_0.25',
-        choices=['mobilenetv1_0.25', 'slim', 'rfb'],
+        default='retinaface',
+        choices=['retinaface', 'slim', 'rfb'],
         help='Select a model architecture for face detection'
     )
     parser.add_argument('--num-workers', default=8, type=int, help='Number of workers to use for data loading.')
@@ -144,7 +144,7 @@ def main(params):
     criterion = MultiBoxLoss(priors=priors, threshold=0.35, neg_pos_ratio=7, variance=cfg['variance'], device=device)
 
     # Initialize model
-    if params.network == "mobilenetv1_0.25":
+    if params.network == "retinaface":
         model = RetinaFace(cfg=cfg)
     elif params.network == "slim":
         model = SlimFace(cfg=cfg)
