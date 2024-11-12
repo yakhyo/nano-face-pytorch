@@ -22,16 +22,16 @@ Tiny-Face is an ultra-lightweight face detection model optimized for mobile and 
 
 | Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | #Params(M) | Size(MB) |
 | ---------- | ---------------------- | ------ | ------ | ------ | ---------- | -------- |
-| SlimFace   | False                  | 79.50% | 79.40% | 68.36% | 0.359      | 1.4      |
-| RFB        | False                  | 80.49% | 81.51% | 75.73% | 0.343      | 1.5      |
+| SlimFace   | False                  | 79.50% | 79.40% | 68.36% | 0.343      | 1.4      |
+| RFB        | False                  | 80.49% | 81.51% | 75.73% | 0.359      | 1.5      |
 | RetinaFace | True                   | 87.69% | 86.39% | 80.21% | 0.426      | 1.8      |
 
 ### Original Image Size
 
 | Models     | Pretrained on ImageNet | Easy   | Medium | Hard   | #Params(M) |
 | ---------- | ---------------------- | ------ | ------ | ------ | ---------- |
-| SlimFace   | False                  | 87.10% | 84.36% | 67.38% | 0.359      |
-| RFB        | False                  | 87.09% | 84.61% | 69.22% | 0.343      |
+| SlimFace   | False                  | 87.10% | 84.36% | 67.38% | 0.343      |
+| RFB        | False                  | 87.09% | 84.61% | 69.22% | 0.359      |
 | RetinaFace | True                   | 90.26% | 87.48% | 72.85% | 0.426      |
 
 ## ✨ Features
@@ -46,7 +46,7 @@ All weights are available in [GitHub release v0.0.1](https://github.com/yakhyo/t
 
 | Models     | PyTorch Weights                                                                                       | ONNX Weights                                                                                            | Input Size |
 | ---------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------- |
-| SlimFace   | [slimface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slim.pth)     | [slimface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slim.onnx)     | 640x640    |
+| SlimFace   | [slimface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slim.pth)         | [slimface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slim.onnx)         | 640x640    |
 | RFB        | [rfb.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/rfb.pth)               | [rfb.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/rfb.onnx)               | 640x640    |
 | RetinaFace | [retinaface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/retinaface.pth) | [retinaface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/retinaface.onnx) | 640x640    |
 
