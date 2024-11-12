@@ -174,4 +174,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## 🔗 References
 
 - This repo based on https://github.com/yakhyo/retinaface-pytorch
-- Slim and RFB model architectures are modified from https://github.com/biubug6/Face-Detector-1MB-with-landmark
+- https://github.com/biubug6/Face-Detector-1MB-with-landmark
+- https://github.com/GOATmessi8/RFBNet
+
