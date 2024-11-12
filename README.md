@@ -46,7 +46,7 @@ All weights are available in [GitHub release v0.0.1](https://github.com/yakhyo/t
 
 | Models     | PyTorch Weights                                                                                       | ONNX Weights                                                                                            | Input Size |
 | ---------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------- |
-| SlimFace   | [slimface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slimface.pth)     | [slimface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slimface.onnx)     | 640x640    |
+| SlimFace   | [slimface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slim.pth)     | [slimface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/slim.onnx)     | 640x640    |
 | RFB        | [rfb.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/rfb.pth)               | [rfb.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/rfb.onnx)               | 640x640    |
 | RetinaFace | [retinaface.pth](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/retinaface.pth) | [retinaface.onnx](https://github.com/yakhyo/tiny-face-pytorch/releases/download/v0.0.1/retinaface.onnx) | 640x640    |
 
